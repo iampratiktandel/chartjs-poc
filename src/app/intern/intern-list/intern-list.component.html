@@ -1,0 +1,15 @@
+<button routerLink="../add">Add Intern</button>
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Email</th>
+  </tr>
+  <tr *ngFor="let item of internList">
+    <td>{{ item.name }}</td>
+    <td>{{ item.email }}</td>
+    <td><button [routerLink]="['../', item.id]">View Profile</button></td>
+    <td><button (click)="deleteIntern(item.id)">Delete</button></td>
+    <td><button [routerLink]="['../edit', item.id]">Edit</button></td>
+  </tr>
+</table>
