@@ -1,1 +1,18 @@
-<router-outlet></router-outlet>
+<!-- <router-outlet></router-outlet> -->
+<button (click)="showForm()">Add Intern</button>
+
+<app-intern-list 
+  *ngIf="!isForm"
+  [internList]="internList"
+  (delete)="delete($event)"
+  (showForm)="showEditForm($event)"
+></app-intern-list>
+
+<app-intern-form
+  *ngIf="isForm"
+  [internData]="internData"
+  (add)="add($event)"
+  (edit)="edit($event)"
+>
+
+</app-intern-form>

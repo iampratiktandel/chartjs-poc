@@ -1,5 +1,3 @@
-<button routerLink="../add">Add Intern</button>
-
 <table>
   <tr>
     <th>Name</th>
@@ -10,6 +8,10 @@
     <td>{{ item.email }}</td>
     <td><button [routerLink]="['../', item.id]">View Profile</button></td>
     <td><button (click)="deleteIntern(item.id)">Delete</button></td>
-    <td><button [routerLink]="['../edit', item.id]">Edit</button></td>
+    <td><button (click)="onEdit(item.id)">Edit</button></td>
   </tr>
 </table>
+
+<div>
+  <!-- <app-intern-profile [internList]="internList" title="User Profile"></app-intern-profile> -->
+</div>

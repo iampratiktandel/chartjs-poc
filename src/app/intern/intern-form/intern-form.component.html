@@ -1,6 +1,6 @@
 <form action="" [formGroup]="internForm">
   Name<input type="text" name="" id="" formControlName="name">
   Email <input type="text" name="" id="" formControlName="email">
-  <button type="submit" (click)="addIntern()" *ngIf="!isEditMode">Add</button>
-  <button type="submit" (click)="editIntern()" *ngIf="isEditMode">Edit</button>
+  <button type="submit" (click)="onAdd()" *ngIf="!isEditMode">Add</button>
+  <button type="submit" (click)="onEdit()" *ngIf="isEditMode">Edit</button>
 </form>

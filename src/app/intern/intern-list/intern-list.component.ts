@@ -1,6 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import { Intern } from '../intern.model';
-import { InternService } from '../intern.service';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 @Component({
   selector: 'app-intern-list',
@@ -9,21 +7,31 @@ import { InternService } from '../intern.service';
 })
 export class InternListComponent implements OnInit {
 
-  public internList: Intern[];
+  @Input() public set internList(value : any) {
+    this._internList = value;
+  }
+  public get internList() : any {
+    return this._internList;
+  }
 
-  constructor(private internService: InternService) { 
-    this.internList = [];
+  @Output() public delete: EventEmitter<number>;
+  @Output() public showForm: EventEmitter<string>;
+  private _internList: any;
+
+  constructor() { 
+    this.delete = new EventEmitter();
+    this.showForm = new EventEmitter();
   }
 
   ngOnInit(): void {
-    this.internService.getInternList().subscribe((response) => {
-      this.internList = response;
-    })
+  
   }
 
   deleteIntern(id: number) {
-    this.internService.deleteIntern(id).subscribe((response) => {
-      alert('Intern Deleted');
-    });
+    this.delete.emit(id);
+  }
+
+  onEdit(id: string) {
+    this.showForm.emit(id);
   }
 }
