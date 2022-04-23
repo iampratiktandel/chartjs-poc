@@ -1,0 +1,13 @@
+.mb {
+  margin-bottom: 20px;
+}
+
+.filter-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.policy_box {
+  background-color: blue;
+  color: white;
+}

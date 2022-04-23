@@ -3,4 +3,25 @@
   <li routerLink="intern">Intern</li>
 </ul>
 <router-outlet></router-outlet> -->
-<canvas id="myChart" width="400" height="400" style="max-height: 400px; max-width: 1000px;" #myChart></canvas>
+<canvas id="myChart" width="400" height="400" style="max-height: 400px; max-width: 1000px;" #myChart>{{spendByPolicyChartBind}}</canvas>
+
+<div class="mb">
+  <div *ngFor="let item of policyFilterBox" class="filter-box">
+    <button (click)="onPolicyClick(item)" class="{{item.isChecked? 'policy_box' : ''}}">{{ item.policy }}</button>
+  </div>
+</div>
+
+<div>
+  <div *ngFor="let item of serviceFilterBoxDisplay" class="filter-box">
+    <button (click)="onServiceClick(item)" class="{{item.isChecked? 'policy_box' : ''}}">{{ item.service }}</button>
+  </div>
+</div>
+
+<div>
+  <div *ngFor="let legend of graphLegends">
+    <p>{{legend.policy}}</p>
+    <ul *ngFor="let item of legend.serviceData">
+      <li>{{ item.service }}</li>
+    </ul>
+  </div>
+</div>
