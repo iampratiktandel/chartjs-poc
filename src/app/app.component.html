@@ -18,7 +18,7 @@
 </div>
 
 <div>
-  <div *ngFor="let legend of graphLegends">
+  <div *ngFor="let legend of graphLegendsDisplay">
     <p>{{legend.policy}}</p>
     <ul *ngFor="let item of legend.serviceData">
       <li>{{ item.service }}</li>

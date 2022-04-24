@@ -22,6 +22,7 @@ export class AppComponent {
     public dataArray: number[];
     public graphData!: any;
     public graphLegends!: any;
+    public graphLegendsDisplay!: any;
     public monthData!: any;
     public datasetArray!: any;
     public policyFilterBox: any;
@@ -30,6 +31,9 @@ export class AppComponent {
     public monthFilterBox!: any;
     public filteredPolicy!: any;
     public filteredService!: any;
+    public pushedPolicy: string[];
+    public isMillion: boolean;
+    public million: number;
 
     constructor() {
         this.dataArray = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
@@ -40,19 +44,22 @@ export class AppComponent {
         this.filteredPolicy = [];
         this.filteredService = [];
         this.graphLegends = [];
+        this.graphLegendsDisplay = [];
+        this.pushedPolicy = [];
         // this.graphData = MillionData;
-        // this.graphData = DollarData;
-        this.graphData = UniData;
+        this.graphData = DollarData;
+        // this.graphData = UniData;
+        this.isMillion = false;
+        this.million = 1;
     }
 
     ngOnInit(): void {
         const d = this.graphData;
         this.monthData = [d.january, d.february, d.march, d.april, d.may, d.june, d.july, d.august, d.september, d.october, d.november, d.december];
         // this.monthData = [ {...this.graphData} ];
-        // console.log(this.monthData);
-
-
-        // console.log(this.datasetArray);
+        this.removeRedundantService(this.monthData);
+    
+        this.million = this.isMillion ? 1000000 : 1;
 
         this.generateDataset(this.monthData);
         if (this.myChart) {
@@ -65,39 +72,31 @@ export class AppComponent {
         monthData.forEach((monthElement: any, monthIndex: number) => {
             monthElement.forEach((policyElement: any, policyIndex: number) => {
                 let colorIndex = policyIndex === 10 ? 0 : policyIndex;
-                this.generateGraphLegends(policyElement.policy);
 
-                // if (this.graphLegends.find((x: any) => x.policy !== policyElement.policy)) {
-                //     this.generateGraphLegends(policyElement.policy);
-                // }
                 for (const key in policyElement) {
                     if (Object.prototype.hasOwnProperty.call(policyElement, key)) {
-                        let lastPushedService = '';
                         if (key === 'serviceData') {
                             const element = policyElement['serviceData'];
                             element.forEach((element: any) => {
-                                if (element.service !== lastPushedService) {
-                                    this.generateServiceFilterBox(element.service);
-                                    const filter = this.datasetArray?.find(({ label }: any) => label === `${element.service} [${policyElement.policy}]`);
-                                    if (filter) {
-                                        this.datasetArray.forEach((elem: any) => {
-                                            if (elem.label === `${element.service} [${policyElement.policy}]`) {
-                                                elem.data?.splice(monthIndex, 0, element.amount);
-                                            }
-                                        });
-                                    } else {
-                                        let dummyArray = [null, null, null, null, null, null, null, null, null, null, null, null];
-                                        dummyArray.splice(monthIndex, 0, element.amount);
-                                        let backgroundColor = this.setColor(colorIndex, monthIndex);
-                                        this.datasetArray.push({
-                                            label: `${element.service} [${policyElement.policy}]`,
-                                            data: dummyArray,
-                                            backgroundColor,
-                                            stack: `Stack ${policyIndex}`
-                                        })
-                                        this.updateGraphLegend(policyIndex, element.service, backgroundColor, dummyArray);
-                                    }
-                                    lastPushedService = element.service;
+                                this.generateServiceFilterBox(element.service);
+                                const filter = this.datasetArray?.find(({ label }: any) => label === `${element.service} [${policyElement.policy}]`);
+                                if (filter) {
+                                    this.datasetArray.forEach((elem: any) => {
+                                        if (elem.label === `${element.service} [${policyElement.policy}]`) {
+                                            elem.data?.splice(monthIndex, 0, element.amount / this.million);
+                                        }
+                                    });
+                                } else {
+                                    let dummyArray: any[] = [null, null, null, null, null, null, null, null, null, null, null, null];
+                                    let amount = element.amount / this.million;
+                                    dummyArray.splice(monthIndex, 0, amount);
+                                    let backgroundColor = this.setColor(colorIndex, monthIndex);
+                                    this.datasetArray.push({
+                                        label: `${element.service} [${policyElement.policy}]`,
+                                        data: dummyArray,
+                                        backgroundColor,
+                                        stack: `Stack ${policyIndex}`
+                                    })
                                 }
                             });
                         }
@@ -108,10 +107,35 @@ export class AppComponent {
                 this.generatePolicyFilterBox(policyElement.policy);
             })
         });
-        // console.log(this.policyFilterBox);
-        // console.log(this.serviceFilterBox);
-        // console.log(this.datasetArray);
-        // console.log(this.graphLegends);
+
+        this.datasetArray.forEach((elem: any) => {
+            let policy = elem.label.split('[')['1'].replace(']', '');
+            let service = elem.label.split('[')['0'].trim();
+
+            if (!this.pushedPolicy.includes(policy)) {
+                this.pushedPolicy.push(policy);
+            }
+
+            let isUniquePolicy = this.graphLegends.find((x: any) => x.policy === policy);
+            let policyIndex = this.pushedPolicy.indexOf(policy);
+
+            if (!isUniquePolicy) {
+                this.graphLegends.push({
+                    policy: policy,
+                    serviceData: []
+                })
+            }
+
+            let isUniqueService = this.graphLegends[policyIndex].serviceData.find((x: any) => x.service === service);
+                if (!isUniqueService) {
+                    this.graphLegends[policyIndex].serviceData.push({
+                        service: service,
+                        backgroundColor: elem.backgroundColor
+                    })
+                }
+
+        });
+        this.graphLegendsDisplay = this.graphLegends;
     }
 
 
@@ -222,9 +246,37 @@ export class AppComponent {
         })
     }
 
+    removeRedundantService(monthData: any) {
+        monthData.forEach((monthElement: any) => {
+            monthElement.forEach((policyElement: any) => {
+                let previousService = '';
+                policyElement.serviceData = policyElement.serviceData.filter((serviceElement: any) => {
+                    if (serviceElement.service !== previousService) {
+                        if (!this.isMillion) {
+                            this.isMillion = serviceElement.amount > 1000000;
+                        }
+                        if (serviceElement.amount < 0) {
+                            return false
+                        }
+                        previousService = serviceElement.service;
+                        return true;
+                    }
+                    return false;
+                });
+            })
+        })
+    }
 
     filterData() {
         let result = [];
+        if (this.filteredPolicy.length) {
+            this.graphLegendsDisplay = this.graphLegends.filter((d: any) => {
+                return this.filteredPolicy.includes(d.policy);
+            })
+        } else {
+            this.graphLegendsDisplay = this.graphLegends;
+        }
+
         if (this.filteredPolicy.length && !this.filteredService.length) {
             result = this.datasetArray.filter((d: any) => {
                 return this.filteredPolicy.includes(d.label.split('[')['1'].replace(']', ''));
@@ -240,11 +292,9 @@ export class AppComponent {
             result = subResult.filter((d: any) => {
                 return this.filteredService.includes(d.label.split('[')['0'].trim());
             });
-            // console.log(subResult);
         } else {
             result = this.datasetArray;
         }
-        // console.log(result);
         this.drawStackBarCanvas(result);
     }
 
@@ -278,16 +328,18 @@ export class AppComponent {
             policy: policy,
             serviceData: []
         })
-        console.log(this.graphLegends);
     }
 
-    updateGraphLegend(policyIndex: number, service: number, backgroundColor: string, data: any) {
-        this.graphLegends[policyIndex].serviceData.push({
-            service: service,
-            backgroundColor: backgroundColor,
-            data: data
-        })
-        // console.log(this.graphLegends);
+    updateGraphLegend(policyIndex: number, policy: string, service: string, backgroundColor: string, data: any) {
+        this.graphLegends.forEach((element: any) => {
+            if (!(element.serviceData.find((x: any) => x.service !== service))) {
+                element.serviceData.push({
+                    service: service,
+                    backgroundColor: backgroundColor,
+                    data: data
+                })
+            }
+        });
     }
 
     onPolicyClick(item: any) {
