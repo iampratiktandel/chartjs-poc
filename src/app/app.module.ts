@@ -7,6 +7,7 @@ import { ParentComponent } from './parent/parent.component';
 import { ChildComponent } from './child/child.component';
 import { ChildTwoComponent } from './child-two/child-two.component';
 import { NotFoundComponent } from './not-found/not-found.component';
+import { DecimalPipe } from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,9 @@ import { NotFoundComponent } from './not-found/not-found.component';
     BrowserModule,
     AppRoutingModule
   ],
-  providers: [],
+  providers: [
+    DecimalPipe
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

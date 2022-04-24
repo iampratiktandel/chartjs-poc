@@ -250,7 +250,7 @@ export const DollarData = {
 export const MillionData = {
   "january": [
       {
-          "policy": "Policy Jan",
+          "policy": "",
           "serviceData": [
               {
                   "service": "Fees - Home Sale Non-Compliance",
@@ -359,7 +359,7 @@ export const MillionData = {
   ],
   "february": [
       {
-          "policy": "Policy Feb",
+          "policy": "",
           "serviceData": [
               {
                   "service": "HOME PURCHASE ASSISTANCE",
@@ -444,7 +444,7 @@ export const MillionData = {
   ],
   "march": [
       {
-          "policy": "Policy Mar",
+          "policy": "",
           "serviceData": [
               {
                   "service": "EXCP OR REIM",
